@@ -75,7 +75,7 @@ Dep.prototype={
 //全局唯一，表示依赖实例的个数
 let uid=0;
 let Observe=function(o,callback){
-    for(let i=0;i<=uid;i++){
+    for(let i=0;i<uid;i++){
         let target=Dep.deps[i]?Dep.deps[i].target:Dep.deps[i];
         if(target===o){Dep.deps[i].addSub(callback);return Dep.deps[i]._r;}
     }
@@ -90,6 +90,7 @@ let Observe=function(o,callback){
 };
 
 
+//测试用例
 let o={id:1,name:'QQ',child:{color:'red'}};
 let z=new Observe(o,()=>{console.log('hahahha')});
 let x=new Observe(o,()=>{console.log('miamiamia')});
