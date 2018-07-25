@@ -12,7 +12,7 @@ React组件即返回JSX元素的函数，可以是普通函数，也可以是Rea
        }
    }
 ```
-如果需要在类中使用this关键字，则要写`constructor`,并在内部调用`super()`。每次state,props的改变都会触发更新，无论改变后的值是否与之前相同。若要避免这种情况，使用PureComponent类（基于浅比较）。
+如果需要在constructor中使用this关键字，则要先调用`super()`。每次state,props的改变都会触发更新，无论改变后的值是否与之前相同。若要避免这种情况，使用PureComponent类（基于浅比较）。
 React组件创建后有三个过程：mount,update,unmount,每个过程都有相应的生命周期钩子(lifecycle hook)。因为单向数据流，父子之间能通讯，那么同级之间就彼此隔离。因此只能使用组件提升（lifting）,即创建父组件，双方利用父组件作为中间人通讯。React组件返回值称为ReactElement，首字母必须大写，类似于html元素，能够有属性值，所有的属性都存放在一个props对象作为参数传递给React组件内部。属性值可以是函数，因此在内部调用该属性值可以触发函数。
 ```javascript
 //ReactElement:
@@ -60,6 +60,6 @@ const ContainerComponent=connect(mapStateToProps,mapDispathToProps)(Presentation
 <App />
 </Provider>
 ```
-经过`connect()`连接产生的容器组件，会自动作为Provider的consumer，当store中产生新的state后便会把新的state及dispatch方法传给所有容器组件。
+经过`connect()`连接产生的容器组件，会自动作为Provider的consumer，当store中产生新的state后便会把新的state传给所有容器组件(如果connect只有一个参数,则还会自动传递dispatch方法,类似于事件监听中Event参数)。
 
 
