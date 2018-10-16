@@ -89,7 +89,7 @@ const sort = (list, a) => {
 
 /**
  *@description: 字符串过滤器,链式调用
- *@param: ( rules: Objct ) 过滤规则。要求过滤函数接受一个string类型参数并返回一个字符串
+ *@param: ( rules: Objct ) 过滤规则。要求过滤函数接受一个string类型参数并返回一个string(最后一个过滤函数不受此限制)
  */
 
 const CharFilter = function CharFilter(rules) {
@@ -97,9 +97,15 @@ const CharFilter = function CharFilter(rules) {
 
     // 默认过滤规则集
     const defaultRules = {
+        // 过滤非数字
         onlyNumber(s) {
-            const result = s.replace(/[^\d]/g, '');
+            const result = s.replace(/\D/g, '');
             return result;
+        },
+        // 判断是否为大陆手机号
+        isPhoneNumber(s) {
+            const c = s.replace(/\s/g, '');
+            return /^1[3|5|8]\d{9}$/.test(c);
         },
     };
 
@@ -117,7 +123,7 @@ const CharFilter = function CharFilter(rules) {
             return this;
         }
         fn.bind(this);
-        // 进行链式调用时实际是调用改写后的方法
+        // 进行链式调用时实际是调用fn方法,将过滤器添加至过滤器队列中
         // 从传入的规则集中添加处理方法(为防止覆盖关键方法这里进行检验)
         if (!/(constructor)|(start)|(end)/.test(key)) this[key] = fn;
     });
@@ -130,12 +136,17 @@ CharFilter.prototype = {
         this.result = s;
         return this;
     },
-    // 如果传入了true,则在每次过滤前将数据打印出来
+
+
+    /**
+     * @description: 在过滤函数之后调用
+     * @param:([,optional]: boolean) 如果为true,则在每次过滤前将数据打印出来
+    */
     end(optional) {
         if (this.result === null) throw new TypeError('请在处理前调用start()函数');
         return this.handlers.reduce((accumulator, handleName) => {
             const handle = this.rules[handleName];
-            if (typeof accumulator !== 'string') throw new TypeError(`过滤函数接收了一个不期待的类型值: ${handleName}`);
+            if (typeof accumulator !== 'string') throw new TypeError(`${handleName}() 接收到了不期待的参数类型。过滤函数应接收/返回一个string`);
             if (optional === true) console.log(`Before ${handleName}(),the value is ${accumulator}.`);
             return handle(accumulator);
         }, this.result);
